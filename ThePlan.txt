@@ -1,0 +1,10 @@
+What the program needs to do: 
+
+1. Determine equipped ilevel
+2. Determine ilevel with new item replacing old item. 
+3. Determine stats for both ilevels. (Determine which two points given we are between, find stats for current point) 
+4. Higher equipped ilevel is good so give + to scoring
+5. Determine difference between new item stats and ideal stats at new ilvl. 
+6. Determine difference between current stats and ideal stats for current equipment. 
+7. Rank stats in order of which stat should be highest. 
+8. Create "score" from stat rankings. 
