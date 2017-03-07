@@ -8,3 +8,9 @@ What the program needs to do:
 6. Determine difference between current stats and ideal stats for current equipment. 
 7. Rank stats in order of which stat should be highest. 
 8. Create "score" from stat rankings. 
+
+
+
+Table for data
+
+Index on ilevel so that as we create interpolated stats we can fill the table with the ilevels
