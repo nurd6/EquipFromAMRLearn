@@ -1,0 +1,11 @@
+## Interface: 70100
+## Title: EquipAMR
+## Version: 1.0
+## Author: Nurd6
+## SavedVariables EamrDB
+
+
+embeds.xml
+
+Code1.lua
+EquipAMR.lua
