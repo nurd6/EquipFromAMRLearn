@@ -7,6 +7,9 @@
     <ProjectGuid>8cac8512-8805-44b6-a0c1-023e21bbc327</ProjectGuid>
     <AssemblyName>EquipAMR</AssemblyName>
     <RootNamespace>EquipAMR</RootNamespace>
+    <DeployBasePath>c:\addons\TestAddons\</DeployBasePath>
+    <RuntimePath />
+    <WowPath>c:\addons\TestAddons\</WowPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
     <OutputPath>.</OutputPath>
