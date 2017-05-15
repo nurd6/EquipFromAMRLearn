@@ -1,18 +1,40 @@
 -- Author      : Nurd6
 -- Create Date : 3/8/2017 11:53:39 AM
 
-function parseintotable ( biginput,name )
-	local stattable = {}
-	index = 1
-	for line in biginput do 
-		stattable[index] = {}
-		for match in string.gmatch(line,"%d+") do 
-			stattable[index][ #stattable[index] + 1 ] = tonumber(match)
-		end 
-		index = index + 1
-	end 
+function EquipAMR:parseintotable ( biginput )
+
+	local tempsplit = {}
+	local sparsetable = {}
+	local counter
+	local tempilvl, low, high
 	
-	return makeusabletable(stattable,name)
+	for token in string.gmatch(line, "[^%s]+") do
+		if token == "Item" or token == "Level" then
+			counter = 0
+		else
+			if counter = 0 then
+				tempilvl = tonumber(token)
+				counter = 1
+				if tempilvl < low then
+					low = tempilvl
+				end
+				if tempilvl > high then 
+					high = tempilvl
+				end
+
+			else 
+				tempsplit[counter] = tonumber(token)			
+				counter = counter + 1
+			end
+		end
+	
+	end
+
+	table.insert(sparsetable, [tempilvl] = tempsplit)
+		
+	return filltherestoftable(sparsetable,low,high)
+
+
 end
 
 function referencedisplaycode ( stable ) --This displays all the rows, use as reference
@@ -21,70 +43,59 @@ function referencedisplaycode ( stable ) --This displays all the rows, use as re
 	end 
 end
 
-function makeusabletable (stable, name)
-	local bigglobalstat = { }
-	local ilvl, low, high
 
-	for outer, row in ipairs(stable) do
-		for inner, row2 in ipars(row) do
-			if inner == 1 then ilvl,low,high = getilowhigh(row2,low,high)
-			elseif inner == 2 then bigglobalstat[name][ilvl].crit = row2
-			elseif inner == 3 then bigglobalstat[name][ilvl].haste = row2
-			elseif inner == 4 then bigglobalstat[name][ilvl].mast = row2
-			elseif inner == 5 then bigglobalstat[name][ilvl].vers = row2
-			end
-		end
-	end
-	bigglobalstat[name].lowi = low
-	bigglobalstat[name].highi = high
-	
-	return filltherestoftable(bigglobalstat, name)
-	
-end
-
-local function getilowhigh ( nlvl, lowi, highi )
-	if lowi == nil then lowi = nlvl end
-	if highi == nil then highi = nlvl end
-	if nlvl < lowi then lowi = nlvl end
-	if nlvl > highi then highi = nlvl end
-	return nlvl, lowi, highi
-end
-	
 	
 	
 
-function statatpoint( ilvl1, stat1, ilvl2, stat2, cur )
+function EquipAMR:statatpoint( ilvl1, stat1, ilvl2, stat2, cur )
 	return ( stat1 + stat2 ) * (  cur / ( ilvl1 + ilvl2 ) )
 end
-function matrixstats( mstat, ilvl, crit, haste, mast, vers )	-- May not need a multidimensional array
-	sz = table.getn(mstat)+1									-- Need to make sure I check that the array isn't empty
-	mstat[sz] = { ilvl, crit, haste, mast, vers }
-	return mstat
+
+function EqupiAMR:setstatatpoint( bigglobalstat, low, high, curilvl )
+	local lcrit,lhaste,lmast,lvers
+	local lstats = {}
+	local tstats = {}
+
+	lcrit = statatpoint( low, bigglobalstat[low][1], high, bigglobalstat[high][1], curilvl )
+	lhaste = statatpoint( low, bigglobalstat[low][2], high, bigglobalstat[high][2], curilvl )
+	lmast = statatpoint( low, bigglobalstat[low][3], high, bigglobalstat[high][3], curilvl )
+	lvers = statatpoint( low, bigglobalstat[low][4], high, bigglobalstat[high][4], curilvl )
+
+	table.insert(lstats, 1 = lcrit)
+	table.insert(lstats, 2 = lhaste)
+	table.insert(lstats, 3 = lmast)
+	table.insert(lstats, 4 = lvers)
+
+	table.insert(tstats, curilvl = lstats)
+
+	return tstats
+
+
+	
 end
 
-function setstatatpoint( bigglobalstat, low, high, curilvl, name )
-	
-	bigglobalstat[name][curilvl].crit = statatpoint( low, bigglobalstat[name][low].crit, high, bigglobalstat[name][high].crit, curilvl )
-	bigglobalstat[name][curilvl].haste = statatpoint( low, bigglobalstat[name][low].haste, high, bigglobalstat[name][high].haste, curilvl )
-	bigglobalstat[name][curilvl].mast = statatpoint( low, bigglobalstat[name][low].mast, high, bigglobalstat[name][high].mast, curilvl ) 
-	bigglobalstat[name][curilvl].vers = statatpoint( low, bigglobalstat[name][low].vers, high, bigglobalstat[name][high].vers, curilvl )
-
-	return bigglobalstat
+function EquipAMR:tableContains(set, key)
+	return set[key] ~= nil
 end
 			
-function filltherestoftable( bigglobalstat, name )
-	lowbound = bigglobalstat[name].lowi
-	upperbound = bigglobalstat[name].highi
-	
+function EquipAMR:filltherestoftable( sparsetable,lowest, highest )
+local curlow, curhigh, lowbound,upperbound
+local tempilvl
+local tempstat = {}
+
+lowbound = lowest
+upperbound = highest
+
 	for i = lowbound, upperbound, 1 do
 		if i % 10 == 0 then curlow = i curhigh = i + 10
-		else bigglobalstat = setstatatpoint( bigglobalstat, curlow, curhigh, i, name )
+		else tempstat = setstatatpoint( sparsetable, curlow, curhigh, i)
 		end
 	end
-	return bigglobalstat
+
+return tempstat
 end
 
-function sumStats(oldnew, nlink  )
+function EquipAMR:sumStats(oldnew, nlink  )
 	local slots = {"Head", "Neck", "Shoulder", "Back", "Chest", "Shirt", "Tabard", "Wrist", "Waist", "Legs", "Feet", "Hands", "Finger0", "Finger1", "Trinket0", "Trinket1", "MainHand", "SecondaryHand"}
 	local invtypes = {"head" = "Head", "neck" = "Neck", "shoulder" = "Shoulder", "body" = "Shirt", "chest" = "Chest", "robe" = "Chest", "feet" = "Feet", "wrist" = "Wrist", "finger" = "Finger0", "trinket" = "Trinket0", "cloak" = "Back", "shield" = "SecondaryHand", "2hweapon" = "MainHand", "weaponmainhand" = "MainHand", "weaponoffhand" = "SecondaryHand", "holdable" = "SecondaryHand", "ranged" = "MainHand", "rangedright" = "MainHand", "thrown" = "MainHand"}
 	local totali, numitems, newi, avgi
@@ -132,7 +143,7 @@ function sumStats(oldnew, nlink  )
 		
 end
 
-local function OnTooltipSetItem(self)
+function EquipAMR:OnTooltipSetItem(self)
 	if not GameTooltip:IsEquippedItem() then --Not going through all the work for the item you're wearing
 		local name, link = self:GetItem()
 		if name then
@@ -151,7 +162,7 @@ local function OnTooltipSetItem(self)
 	end
 end
 
-function Comparitor( nlink)
+function EquipAMR:Comparitor( nlink)
 	local _, eitem = GetAverageItemLevel()
 	local newslvl, newcrit, newhaste, newmast, newvers = sumStats( n, nlink)
 	local amrnow = self.db.char[name].stats.stattable[eitem]
@@ -182,12 +193,12 @@ function Comparitor( nlink)
 	return cstatus, hstatus, mstatus, vstatus
 end
 
-function ud1( strClose )  -- These functions exist in case I need to be able to programatically change the colors
+function EquipAMR:ud1( strClose )  -- These functions exist in case I need to be able to programatically change the colors
 	if strClose = "closer" then return 0.2 else return 1 end
 end
-function ud2( strClose )
+function EquipAMR:ud2( strClose )
 	if strClose = "closer" then return 1 else return 0.2 end
 end
-function ud3( strClose )
+function EquipAMR:ud3( strClose )
 	if strClose = "closer" then return 0.2 else return 0.2 end
 end
